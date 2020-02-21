@@ -9,6 +9,7 @@
 
 <script>
 import {vueMixins} from '../assets/js/mixins.js'
+
 export default {
   name: 'Situation',
   mixins: [vueMixins], // 注册mixins

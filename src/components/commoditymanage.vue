@@ -2,25 +2,33 @@
   <div class="iframe_body">
     <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
       <el-tab-pane label="全部" name="first">
-        <el-form :inline="true" :model="formInline" class="demo-form-inline table-serch">
+        <el-form :inline="true" :model="formSearchCommodity" class="demo-form-inline table-serch">
           <el-form-item label="商品名称：" size="small" placeholder="请输入商品名称">
-            <el-input v-model="formInline.content" size="small" style="width:180px;"></el-input>
+            <el-input v-model="formSearchCommodity.content" size="small" style="width:180px;"></el-input>
           </el-form-item>
           <el-form-item label="商品类别：" size="small" placeholder="请选择商品标签" style="margin:0 0 0 10px">
-            <el-select v-model="formInline.stars" style="width:180px;">
-              <el-option v-for="(item,index) in formInline.starOptions" :label="item.option" :value="item.value" :key="index"></el-option>
+            <el-select v-model="formSearchCommodity.stars" style="width:180px;">
+              <el-option
+                v-for="(item,index) in formSearchCommodity.starOptions"
+                :label="item.option"
+                :value="item.value"
+                :key="index"
+              ></el-option>
             </el-select>
           </el-form-item>
-          <el-button type="primary" size="small" style="margin:0 0 0 10px;padding:9px 30px;">搜索</el-button>
+          <el-button
+            type="primary"
+            size="small"
+            style="margin:0 0 0 10px;padding:9px 30px;"
+            @click="Search()"
+          >搜索</el-button>
           <el-button size="small" style="padding:9px 30px;">导出</el-button>
         </el-form>
         <div style="margin:0 0 10px;">
-          <a>
             <el-button type="primary" size="medium">批量通过</el-button>
-          </a>
-          <a href="commodity-type.html">
-            <el-button type="primary" size="medium" style="margin:0 0 0 10px;">商品类别编辑</el-button>
-          </a>
+            <router-link to="/commoditytype">
+              <el-button type="primary" size="medium" style="margin:0 0 0 10px;">商品类别编辑</el-button>
+            </router-link>
         </div>
 
         <!--表单-->
@@ -80,6 +88,7 @@
                   size="mini"
                   style="margin:0 0 5px;"
                   v-if="scope.row.IsSell==0"
+                  @click="Shelves(scope.row)"
                 >上架</el-button>
                 <el-button
                   type="danger"
@@ -87,7 +96,7 @@
                   size="mini"
                   style="margin:0 0 5px;"
                   v-else
-                  @click="offShelves(scope.row)"
+                  @click="Shelves(scope.row)"
                 >下架</el-button>
                 <el-button
                   type="success"
@@ -95,8 +104,15 @@
                   size="mini"
                   style="margin:0 0 5px;"
                   v-show="scope.row.Status==0"
+                  @click="Examine(scope.row)"
                 >审核通过</el-button>
-                <el-button type="primary" plain size="mini" style="margin:0 0 5px;">查看商品</el-button>
+                <el-button
+                  type="primary"
+                  plain
+                  size="mini"
+                  style="margin:0 0 5px;"
+                  @click="checkCommodity(scope.row)"
+                >查看商品</el-button>
                 <a v-show="scope.row.Status==1" :href="'/evaluatemanage.html?id='+scope.row.Id">
                   <el-button type="primary" plain size="mini" style="margin:0 0 5px;">用户评价</el-button>
                 </a>
@@ -150,30 +166,36 @@
     </el-dialog>
 
     <!--小程序二维码弹框-->
-    <el-dialog title :visible.sync="dialogScanQr" width="250px" center>
+    <el-dialog :visible.sync="dialogScanQr" width="250px" center>
       <p style="font-size:16px;font-weight:bold;text-align:center">
         微信扫一扫
         <br />打开小程序
       </p>
-      <img src class style="width:120px;display:block;margin:0 auto;padding:20px 0 30px;" />
+      <img
+        :src="ScanQrImg"
+        class
+        style="width:120px;display:block;margin:0 auto;padding:20px 0 30px;"
+      />
     </el-dialog>
   </div>
 </template>
 <script>
-import {vueMixins} from '../assets/js/mixins.js'
+import { vueMixins } from '../assets/js/mixins.js'
 import '../assets/css/city_backstage.css'
 export default {
   name: 'commodityManage',
   mixins: [vueMixins], // 注册mixins
-  data () {
+  data() {
     return {
       count: 0, // 数据条数，用来分页
       dialogSortSeen: false,
+      ScanQrImg: '',
       editRow: {
         Sort: '',
         Id: 0
       },
-      queryPara: {// 用来请求
+      queryPara: {
+        // 用来请求
         cityInfoId: 1317,
         areaCode: 110107,
         pageIndex: 1,
@@ -186,30 +208,28 @@ export default {
       dialogRecommendSeen: false,
       dialogContent: false,
       dialogIndex: '',
-      formInline: {
-        content: '',
-        title: '',
-        evaluateID: '',
+      formSearchCommodity: {
+        Name: '',
         stars: '',
         starOptions: [
-          {value: '1', option: '五星'},
-          {value: '2', option: '四星'},
-          {value: '3', option: '三星'},
-          {value: '4', option: '二星'},
-          {value: '5', option: '一星'}
-        ],
-        date: ''
+          { value: '1', option: '五星' },
+          { value: '2', option: '四星' },
+          { value: '3', option: '三星' },
+          { value: '4', option: '二星' },
+          { value: '5', option: '一星' }
+        ]
       },
       list: [],
-      formCommoditySort: {sort: ''}
+      formCommoditySort: { sort: '' }
     }
   },
   methods: {
-    loadData() { // 加载数据
+    loadData() {
+      // 加载数据
       var self = this
-      self.loading = true// 显示加载动画
+      self.loading = true // 显示加载动画
       // 请求数据
-      // $.post(self.config.apiUrl+"/city/GetGoodsList", this.queryPara, function (res) {
+      // $.post(self.webconfig.domain+"/city/GetGoodsList", this.queryPara, function (res) {
       // if (res.code === 1) {//获取数据成功
       //     vm.list = [];
       //     vm.list = res.data || [];
@@ -223,6 +243,7 @@ export default {
       // 此处模拟上面的根据接口成功获取数据
       var list = [
         {
+          Id: 123,
           ImgUrl: 'https://i.vzan.cc/image/jpg/2017/12/18/1913525ddfba50b89a435fa0bacf1f5971c368.jpg@!640x210',
           Name: '小陈',
           Price: '125',
@@ -235,6 +256,7 @@ export default {
           Sort: '52'
         },
         {
+          Id: 124,
           ImgUrl: 'https://i.vzan.cc/image/jpg/2017/12/18/1913525ddfba50b89a435fa0bacf1f5971c368.jpg@!640x210',
           Name: '小陈',
           Price: '125',
@@ -247,6 +269,7 @@ export default {
           Sort: '52'
         },
         {
+          Id: 125,
           ImgUrl: 'https://i.vzan.cc/image/jpg/2017/12/18/1913525ddfba50b89a435fa0bacf1f5971c368.jpg@!640x210',
           Name: '小陈',
           Price: '125',
@@ -260,10 +283,11 @@ export default {
         }
       ]
       self.list = list
-      self.loading = false// 关闭加载动画
+      self.loading = false // 关闭加载动画
       self.count = 11
     },
-    handleClick() { // 切换导航
+    handleClick() {
+      // 切换导航
       var self = this
       if (self.activeName === 'first') {
         self.queryPara.IsSell = ''
@@ -277,12 +301,14 @@ export default {
         self.queryPara.IsSell = 0
       }
     },
-    switchPage(type, id) { // 跳转页面
+    switchPage(type, id) {
+      // 跳转页面
       if (type === 1) {
-        location.href = `http://www.baidu.com`// 跳转页面
+        location.href = `http://www.baidu.com` // 跳转页面
       }
     },
-    convertValue(val) { // 转换数据
+    convertValue(val) {
+      // 转换数据
       if (val === 0) {
         return '待审核'
       }
@@ -291,39 +317,43 @@ export default {
       }
       return '正常'
     },
-    delComment(index, item) { // 删除评论
+    delComment(index, item) {
+      // 删除评论
       var self = this
       var str = `你确定要删除该评论?`
       this.$confirm(str, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        // 请求数据
-        // $.post("此处请输入接口链接，请询问后端开发", this.queryPara, function (res) {
-        //    if (res.code === 1) {//删除数据成功
-        //       self.list.splice(index, 1);//接口返回删除成功后，在删除本地的数据，splice是删除
-        //    } else {//删除数据失败
-        //        self.$message(res.msg);//弹出删除失败提示
-        //    }
-        // });
-
-        // 此处模拟上面的根据接口删除数据
-        self.list.splice(index, 1)// 删除本地数据
-        self.$message('删除成功！')// 弹出提示
-      }).catch(() => {
-
       })
+        .then(() => {
+          // 请求数据
+          // $.post("此处请输入接口链接，请询问后端开发", this.queryPara, function (res) {
+          //    if (res.code === 1) {//删除数据成功
+          //       self.list.splice(index, 1);//接口返回删除成功后，在删除本地的数据，splice是删除
+          //    } else {//删除数据失败
+          //        self.$message(res.msg);//弹出删除失败提示
+          //    }
+          // });
+
+          // 此处模拟上面的根据接口删除数据
+          self.list.splice(index, 1) // 删除本地数据
+          self.$message('删除成功！') // 弹出提示
+        })
+        .catch(() => {})
     },
-    showEditDialog(index, item) { // 显示修改窗口
+    showEditDialog(index, item) {
+      // 显示修改窗口
       var self = this
-      self.editItem = item// 赋值给当前修改数据
-      self.dialogVisible = true// 显示窗口
+      self.editItem = item // 赋值给当前修改数据
+      self.dialogVisible = true // 显示窗口
     },
-    choiceEvent(val) { // 下拉框选择事件
+    choiceEvent(val) {
+      // 下拉框选择事件
       console.log(val)
     },
-    saveEditData() { // 保存修改数据
+    saveEditData() {
+      // 保存修改数据
       var self = this
       // 请求数据
       // $.post("此处请输入接口链接，请询问后端开发", self.editItem, function (res) {
@@ -339,10 +369,11 @@ export default {
       // });
 
       // 此处模拟上面的根据接口修改数据成功
-      self.$message('修改成功！')// 弹出提示
-      self.dialogVisible = false// 关闭窗口
+      self.$message('修改成功！') // 弹出提示
+      self.dialogVisible = false // 关闭窗口
     },
-    showAddDialog() { // 显示修改窗口
+    showAddDialog() {
+      // 显示修改窗口
       var self = this
       // 初始化addItem数据
       self.addItem = {
@@ -351,9 +382,10 @@ export default {
         Content: '',
         State: 0
       }
-      self.dialogVisible2 = true// 显示窗口
+      self.dialogVisible2 = true // 显示窗口
     },
-    saveAddData() { // 保存修改数据
+    saveAddData() {
+      // 保存修改数据
       var self = this
       // 请求数据
       // $.post("此处请输入接口链接，请询问后端开发", self.editItem, function (res) {
@@ -371,17 +403,19 @@ export default {
       self.addItem.Id = 11
       self.addItem.CreateDate = '2020-02-08 08:00:00'
       self.list.push(self.addItem)
-      self.$message('添加成功！')// 弹出提示
-      self.dialogVisible2 = false// 关闭窗口
+      self.$message('添加成功！') // 弹出提示
+      self.dialogVisible2 = false // 关闭窗口
     },
 
-    Sort(row) { // 排序
+    Sort(row) {
+      // 排序
       var self = this
       self.editRow.Id = row.Id
       self.editRow.Sort = row.Sort
       self.dialogSortSeen = true
     },
-    saveSortData() { // 保存排序
+    saveSortData() {
+      // 保存排序
       var self = this
 
       // 请求数据
@@ -397,37 +431,100 @@ export default {
       // });
 
       // 此处模拟上面的根据接口修改数据成功
-      self.$message('修改成功！')// 弹出提示
-      self.dialogSortSeen = false// 关闭窗口
+      self.$message('修改成功！') // 弹出提示
+      self.dialogSortSeen = false // 关闭窗口
     },
-    offShelves(row) { // 下架
+    Shelves(row) {
+      // 上下架
       var self = this
-      var str = '你确定要下架该商品?'
+      if (row.IsSell === 0) {
+        var str = '你确定要上架该商品?'
+        this.$confirm(str, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+          .then(() => {
+            // 请求数据
+            // $.post(self.webconfig.domain+'/city/UpdateGoodsSell', self.queryPara, function (res) {
+            //    if (res.code === 1) {//上架架数据成功
+            //     self.$message('上架成功！');
+            //    } else {//上架架数据失败
+            //        self.$message(res.msg);//弹出上架失败提示
+            //    }
+            // });
+
+            // 此处模拟上面的根据接口删除数据
+            self.$message('上架成功！') // 弹出提示
+            self.loadData()
+          })
+          .catch(() => {})
+      } else {
+        var str1 = '你确定要下架该商品?'
+        this.$confirm(str1, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+          .then(() => {
+            // 请求数据
+            // $.post(self.webconfig.domain+'/city/UpdateGoodsSell', self.queryPara, function (res) {
+            //    if (res.code === 1) {//下架数据成功
+            //     self.$message('下架成功！');
+            //    } else {//下架数据失败
+            //        self.$message(res.msg);//弹出下架失败提示
+            //    }
+            // });
+
+            // 此处模拟上面的根据接口删除数据
+            self.$message('下架成功！') // 弹出提示
+            self.loadData()
+          })
+          .catch(() => {})
+      }
+    },
+    Examine(row) {
+      // 审核通过
+      var self = this
+      var str = '你确定要审核通过该商品?'
       this.$confirm(str, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        // 请求数据
-        // $.post(self.webconfig.domain+'/city/UpdateGoodsSell', this.queryPara, function (res) {
-        //    if (res.code === 1) {//下架数据成功
-        //     self.$message('下架成功！');
-        //    } else {//下架数据失败
-        //        self.$message(res.msg);//弹出下架失败提示
-        //    }
-        // });
-
-        // 此处模拟上面的根据接口删除数据
-        self.$message('下架成功！')// 弹出提示
-        loadData()
-      }).catch(() => {
-
       })
-    }
+        .then(() => {
+          // 请求数据
+          // $.post(self.webconfig.domain+/city/UpdateGoodsStatus, self.queryPara, function (res) {
+          //    if (res.code === 1) {//审核通过数据成功
+          //       self.$message('审核通过成功！');//接口返回删除成功后，在删除本地的数据，splice是删除
+          //    } else {//审核数据失败
+          //       self.$message('审核通过失败！')//弹出删除失败提示
+          //    }
+          // });
 
+          // 此处模拟上面的根据接口删除数据
+          self.$message('审核通过成功！') // 弹出提示
+        })
+        .catch(() => {})
+    },
+    checkCommodity(row) {
+      // 查看商品小程序二维码
+      var self = this
+      self.dialogScanQr = true
+    },
+    Search() {
+      // 请求数据
+      // $.post("此处请输入接口链接，请询问后端开发", self.formSearchCommodity, function (res) {
+      //    if (res.code === 1) {//审核通过数据成功
+      //       self.$message('审核通过成功！');//接口返回删除成功后，在删除本地的数据，splice是删除
+      //    } else {//审核数据失败
+      //       self.$message('审核通过失败！')//弹出删除失败提示
+      //    }
+      // });
+    }
   },
   mounted: function() {},
-  created: function () {
+  created: function() {
     this.loadData()
   }
 }

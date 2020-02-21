@@ -133,6 +133,7 @@ export let vueMixins = {
       if (time === undefined) {
         return ''
       }
+      // eslint-disable-next-line no-irregular-whitespace
       var date = new Date(parseInt(time.substr(6, 13))) // 时间戳为10位需*1000，时间戳为13位的话不需乘1000
       var y = date.getFullYear()
       var m = date.getMonth() + 1
