@@ -34,7 +34,7 @@
                     :on-success="handleAvatarSuccess"
                     :before-upload="beforeAvatarUpload"
                   >
-                    <img v-if="formIndex.imageUrl" :src="form.SharpImgUrl" class="avatar" />
+                    <img v-if="form.imageUrl" :src="form.SharpImgUrl" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                   </el-upload>
                   <p class="alert-f">推荐尺寸200*200，不更改默认为页面截图</p>
@@ -50,7 +50,7 @@
                     :on-success="handleAvatarSuccess"
                     :before-upload="beforeAvatarUpload"
                   >
-                    <img v-if="formIndex.imageQr" :src="form.KfQRCode" class="avatar" />
+                    <img v-if="form.imageQr" :src="form.KfQRCode" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                   </el-upload>
                   <p class="alert-f">上传个人二维码，作为用户联系城主的方式</p>
@@ -271,7 +271,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
+        <el-button type="primary">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -506,7 +506,10 @@ export default {
         .catch(function (error) {
           console.log(error)
         })
-    }
+    },
+    handleClick() {},
+    handleAvatarSuccess() {},
+    beforeAvatarUpload() {}
   },
   mounted: function() {},
   created: function() {
