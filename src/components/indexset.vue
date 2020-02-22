@@ -6,12 +6,12 @@
         <div>
           <div class="title-bar" style="margin:5px 0 0;">基础信息</div>
           <div style="padding: 0 0 0 20px;">
-            <el-form :model="formIndex" label-width="70px" class="formIndex" style="width:420px;">
+            <el-form label-width="70px" class="formIndex" style="width:420px;">
               <div>
                 <div class="big-title">首页标题</div>
                 <el-form-item label="首页标题" style="margin:10px 0 0;">
                   <el-input
-                    v-model.trim="formIndex.title"
+                    v-model.trim="form.IndexTitle"
                     placeholder="最多4个字，不填默认为“XX优选”"
                     size="medium"
                   ></el-input>
@@ -21,7 +21,7 @@
                 <div class="big-title">首页分享</div>
                 <el-form-item label="分享标题" style="margin:10px 0 0;" class="formIndex">
                   <el-input
-                    v-model.trim="formIndex.shareTitle"
+                    v-model.trim="form.SharpTitle"
                     placeholder="最多15个字，不填默认为“XX优选-好吃好玩特划算”"
                     size="medium"
                   ></el-input>
@@ -34,7 +34,7 @@
                     :on-success="handleAvatarSuccess"
                     :before-upload="beforeAvatarUpload"
                   >
-                    <img v-if="formIndex.imageUrl" :src="formIndex.imageUrl" class="avatar" />
+                    <img v-if="formIndex.imageUrl" :src="form.SharpImgUrl" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                   </el-upload>
                   <p class="alert-f">推荐尺寸200*200，不更改默认为页面截图</p>
@@ -50,13 +50,13 @@
                     :on-success="handleAvatarSuccess"
                     :before-upload="beforeAvatarUpload"
                   >
-                    <img v-if="formIndex.imageQr" :src="formIndex.imageQr" class="avatar" />
+                    <img v-if="formIndex.imageQr" :src="form.KfQRCode" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                   </el-upload>
                   <p class="alert-f">上传个人二维码，作为用户联系城主的方式</p>
                 </el-form-item>
               </div>
-              <el-button type="primary" style="margin:20px 0 0 70px;padding:12px 50px;">保存</el-button>
+              <el-button @click="saveBaseInforData()" type="primary" style="margin:20px 0 0 70px;padding:12px 50px;">保存</el-button>
             </el-form>
           </div>
         </div>
@@ -67,7 +67,7 @@
             <el-button type="primary" size="medium" @click="dialogAdFormVisible=true">新增轮播图</el-button>
             <div class="alert-f" style="margin: 5px 0;">最多上传5张轮播图，不添加则展示默认宣传图片</div>
           </div>
-          <!--表单-->
+          <!--表单list01-->
           <template>
             <el-table
               ref="multipleTable"
@@ -101,28 +101,29 @@
           <template>
             <el-table
               ref="multipleTable"
-              :data="tableDataIndexIcon"
+              :data="list02"
               tooltip-effect="dark"
               border
               style="width:800px;"
               @selection-change="handleSelectionChange"
             >
-              <el-table-column prop="name" label="名称" width="120"></el-table-column>
-              <el-table-column prop="icon" label="图标" show-overflow-tooltip>
+              <el-table-column prop="Title" label="名称" width="120"></el-table-column>
+              <el-table-column prop="ImgUrl" label="图标" show-overflow-tooltip>
                 <template slot-scope="scope">
-                  <img :src="scope.row.icon" style="display:block;width:100%;" />
+                  <img :src="scope.row.ImgUrl" style="display:block;width:100%;" />
                 </template>
               </el-table-column>
-              <el-table-column prop="url" label="关联地址" width="200"></el-table-column>
+              <el-table-column prop="Link" label="关联地址" width="200"></el-table-column>
               <el-table-column prop="sort" label="排序" width="120"></el-table-column>
               <el-table-column prop="state" label="状态" width="120"></el-table-column>
               <el-table-column label="操作" width="150">
-                <template slot-scope="scope">
                   <router-link to="/indexicon">
                     <el-button type="primary" plain size="mini">编辑</el-button>
                   </router-link>
-                  <el-button type="danger" plain size="mini">关闭</el-button>
-                </template>
+                  <template slot-scope="scope">
+                    <el-button type="danger" plain size="mini" v-if="scope.row.status===0">关闭</el-button>
+                    <el-button type="success" plain size="mini" v-else>开启</el-button>
+                  </template>
               </el-table-column>
             </el-table>
           </template>
@@ -134,23 +135,21 @@
           <template>
             <el-table
               ref="multipleTable"
-              :data="tableDataBottomNav"
+              :data="list03"
               tooltip-effect="dark"
               border
               style="width:800px;"
               @selection-change="handleSelectionChange"
             >
-              <el-table-column prop="name" label="名称" width="120"></el-table-column>
-              <el-table-column prop="icon" label="图标" show-overflow-tooltip>
+              <el-table-column prop="Title" label="名称" width="120"></el-table-column>
+              <el-table-column prop="ImgUrl" label="图标" show-overflow-tooltip>
                 <template slot-scope="scope">
-                  <img :src="scope.row.icon" style="display:block;width:100%;" />
+                  <img :src="scope.row.ImgUrl" style="display:block;width:100%;" />
                 </template>
               </el-table-column>
-              <el-table-column prop="url" label="关联地址" width="200"></el-table-column>
+              <el-table-column prop="Link" label="关联地址" width="200"></el-table-column>
               <el-table-column label="操作" width="150">
-                <template slot-scope="scope">
                   <el-button type="primary" plain size="mini">编辑</el-button>
-                </template>
               </el-table-column>
             </el-table>
           </template>
@@ -170,28 +169,26 @@
             <el-button size="medium">批量删除广告</el-button>
             <div class="alert-f" style="margin: 5px 0;">最多添加8张轮播图，不添加则展示默认宣传图片</div>
           </div>
-          <!--表单-->
+          <!--表单list04-->
           <template>
             <el-table
               ref="multipleTable"
-              :data="tableData"
+              :data="list04"
               tooltip-effect="dark"
               border
               style="width: 100%;"
               @selection-change="handleSelectionChange"
             >
               <el-table-column type="selection" width="55"></el-table-column>
-              <el-table-column prop="img" label="图片" show-overflow-tooltip>
+              <el-table-column prop="ImgUrl" label="图片">
                 <template slot-scope="scope">
-                  <img :src="scope.row.img" style="display:block;width:100%;" />
+                  <img :src="scope.row.ImgUrl" style="display:block;width:100%;" />
                 </template>
               </el-table-column>
-              <el-table-column prop="url" label="url" width="120"></el-table-column>
-              <el-table-column prop="type" label="类型" width="100"></el-table-column>
-              <el-table-column prop="imgType" label="图片类型" width="120"></el-table-column>
-              <el-table-column prop="addDate" label="添加日期" width="140"></el-table-column>
-              <el-table-column prop="outdate" label="过期日期" width="140"></el-table-column>
-              <el-table-column prop="sort" label="排序" width="60"></el-table-column>
+              <el-table-column prop="Link" label="url" width="120"></el-table-column>
+              <el-table-column prop="Addtime" label="添加日期" width="140"></el-table-column>
+              <el-table-column prop="ExpireTime" label="过期日期" width="140"></el-table-column>
+              <el-table-column prop="Sort" label="排序" width="60"></el-table-column>
               <el-table-column label="操作" width="150">
                 <template slot-scope="scope">
                   <el-button type="primary" plain size="mini">编辑</el-button>
@@ -381,11 +378,19 @@ export default {
       dialogNavSeen: false,
       dialogShopAdSeen: false,
       radio: 1,
-      formIndex: {// 首页上传轮播图
-        title: '',
-        shareTitle: '',
-        imageUrl: '',
-        imageQr: ''
+      queryPara: {
+        // 用来请求
+        cityInfoId: 61165
+      },
+      list01: [],
+      list02: [],
+      list03: [],
+      list04: [],
+      form: {// 首页设置
+        IndexTitle: '',
+        SharpTitle: '',
+        SharpImgUrl: '',
+        KfQRCode: ''
       },
       formIndexAd: {
         imageUrl: '',
@@ -403,37 +408,6 @@ export default {
         ],
         customUrl: ''
       },
-      list01: [],
-      tableDataIndexIcon: [
-        {
-          name: '分类1',
-          icon: '',
-          url: '/admini/activity/12',
-          sort: '23',
-          state: '关闭'
-        }
-      ],
-      tableDataBottomNav: [
-        {
-          name: '分类1',
-          icon: '',
-          url: '/admini/activity/12'
-        }
-      ],
-      tableData: [
-        {
-          date: '2016-05-03',
-          img:
-            'https://i.vzan.cc/image/jpg/2017/12/18/1913525ddfba50b89a435fa0bacf1f5971c368.jpg@!640x210',
-          url:
-            'https://i.vzan.cc/image/jpg/2017/12/18/1913525ddfba50b89a435fa0bacf1f5971c368.jpg@!640x210',
-          type: '管理员添加',
-          imgType: '好店首页轮播图',
-          addDate: '2019-12-05 12:00',
-          outdate: '无限制',
-          sort: '999'
-        }
-      ],
       formShop: {
         imageUrl: '',
         url: '',
@@ -443,6 +417,103 @@ export default {
       goodShopEvaluate: { value: false, radio: 1 },
       goodShopRecommend: { value: false, radio: 1 }
     }
+  },
+  methods: {
+    loadData01() {
+      // 加载数据
+      var self = this
+      self.loading = true // 显示加载动画
+      self.$axios({
+        method: 'GET',
+        url: '/city/GetIndexCarousel',
+        params: self.queryPara
+      })
+        .then(function (res) {
+          if (res.data.code === 1) { // 获取数据成功
+            self.list01 = []
+            self.list01 = res.data.obj || []
+          } else { // 获取数据失败
+          }
+          self.loading = false
+          console.log(res)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
+    loadData02() {
+      // 加载数据
+      var self = this
+      self.loading = true // 显示加载动画
+      self.$axios({
+        method: 'GET',
+        url: '/city/GetIndexButtonConfig',
+        params: self.queryPara
+      })
+        .then(function (res) {
+          if (res.data.code === 1) { // 获取数据成功
+            self.list02 = []
+            self.list02 = res.data.obj || []
+          } else { // 获取数据失败
+          }
+          self.loading = false
+          console.log(res)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
+    loadData03() {
+      // 加载数据
+      var self = this
+      self.loading = true // 显示加载动画
+      self.$axios({
+        method: 'GET',
+        url: '/city/GetIndexButtonConfig',
+        params: self.queryPara
+      })
+        .then(function (res) {
+          if (res.data.code === 1) { // 获取数据成功
+            self.list03 = []
+            self.list03 = res.data.obj || []
+          } else { // 获取数据失败
+          }
+          self.loading = false
+          console.log(res)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
+    loadData04() {
+      // 加载数据
+      var self = this
+      self.loading = true // 显示加载动画
+      self.$axios({
+        method: 'GET',
+        url: '/city/GetStoreAdCarouse',
+        params: self.queryPara
+      })
+        .then(function (res) {
+          if (res.data.code === 1) { // 获取数据成功
+            self.list04 = []
+            self.list04 = res.data.obj || []
+          } else { // 获取数据失败
+          }
+          self.loading = false
+          console.log(res)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    }
+  },
+  mounted: function() {},
+  created: function() {
+    this.loadData01()
+    this.loadData02()
+    this.loadData03()
+    this.loadData04()
   }
 }
 </script>

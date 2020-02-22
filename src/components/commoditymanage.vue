@@ -197,11 +197,10 @@ export default {
       queryPara: {
         // 用来请求
         cityInfoId: 61165,
-        areaCode: 110107,
         pageIndex: 1,
         pageSize: 10,
-        IsSell: '',
-        Status: ''
+        isSell: '',
+        status: ''
       },
       activeName: 'first',
       dialogScanQr: false,
@@ -228,17 +227,16 @@ export default {
       // 加载数据
       var self = this
       self.loading = true // 显示加载动画
-      console.log(this.$http)
       self.$axios({
-        method: 'get',
+        method: 'GET',
         url: '/city/GetGoodsList',
-        data: self.queryPara
+        params: self.queryPara
       })
         .then(function (res) {
-          if (res.code === 1) { // 获取数据成功
+          if (res.data.code === 1) { // 获取数据成功
             self.list = []
-            self.list = res.data || []
-            self.count = res.count
+            self.list = res.data.obj || []
+            self.count = res.data.obj.count
           } else { // 获取数据失败
             self.count = 0
           }

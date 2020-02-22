@@ -11,7 +11,7 @@
 import {vueMixins} from '../assets/js/mixins.js'
 
 export default {
-  name: 'Situation',
+  name: 'situation',
   mixins: [vueMixins], // 注册mixins
   data () {
     return {
@@ -19,7 +19,7 @@ export default {
     }
   },
   created: function () {
-    console.log(this.config.apiUrl)
+
   }
 }
 </script>

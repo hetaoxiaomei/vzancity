@@ -95,6 +95,12 @@ export default {
         }
       ]
     }
+  },
+  created: function() {
+    var key = this.$cookie.get('UserCookieNew')
+    if (!key || key == null || key === '') { // 判断当前的token是否存在
+      window.location.href = 'https://user.vzan.com/home/login'
+    }
   }
 }
 </script>

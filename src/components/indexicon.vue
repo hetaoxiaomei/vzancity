@@ -12,8 +12,8 @@
                     <img v-if="formIndexIcon.imageUrl" :src="formIndexIcon.imageUrl" class="avatar">
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                     </el-upload>
-                    <div @click="dialogIconSeen=true" style="position:absolute;top:56px;left:85px;padding:0 5px;background:#66b1ff;color:#fff;font-size:12px;line-height:20px;display:inline-block;border-radius:2px;">从图标库中选</div>
-                    <p style="color:#909399;font-size:12px;line-height:1;margin:10px 0 0;">点击图标更换，推荐尺寸75*75</p>
+                    <div @click="dialogIconSeen=true" class="change-icon">从图标库中选</div>
+                    <p class="alert-f">点击图标更换，推荐尺寸75*75</p>
                 </el-form-item>
                 <el-form-item label="入口名称" prop="name" style="margin:10px 0 0;">
                     <el-input v-model.trim="formIndexIcon.name" placeholder="最多4个字" size="medium"></el-input>
@@ -111,3 +111,15 @@ export default {
   created: function () {}
 }
 </script>
+<style>
+ change-icon{
+   position:absolute;
+    top:56px;left:85px;
+    padding:0 5px;
+    background:#66b1ff;
+    color:#fff;
+    font-size:12px;
+    line-height:20px;
+    display:inline-block;
+    border-radius:2px;}
+</style>

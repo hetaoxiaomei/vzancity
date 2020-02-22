@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Situation from '@/components/Situation'
+import situation from '@/components/situation'
 import indexset from '@/components/indexset'
 import indexicon from '@/components/indexicon'
 import ordermanage from '@/components/ordermanage'
@@ -18,52 +18,82 @@ export default new Router({
     {
       path: '/',
       name: '同城概况',
-      component: Situation
+      component: situation,
+      meta: {
+        requireAuth: true // 添加该字段 ( 字段名可以自定义 )，表示进入这个路由是需要登录的
+      }
     },
     {
       path: '/indexset',
       name: '首页管理',
-      component: indexset
+      component: indexset,
+      meta: {
+        requireAuth: true // 添加该字段 ( 字段名可以自定义 )，表示进入这个路由是需要登录的
+      }
     },
     {
       path: '/indexicon',
       name: '入口设置',
-      component: indexicon
+      component: indexicon,
+      meta: {
+        requireAuth: true // 添加该字段 ( 字段名可以自定义 )，表示进入这个路由是需要登录的
+      }
     },
     {
       path: '/ordermanage',
       name: '订单管理',
-      component: ordermanage
+      component: ordermanage,
+      meta: {
+        requireAuth: true // 添加该字段 ( 字段名可以自定义 )，表示进入这个路由是需要登录的
+      }
     },
     {
       path: '/commoditymanage',
       name: '商品管理',
-      component: commoditymanage
+      component: commoditymanage,
+      meta: {
+        requireAuth: true // 添加该字段 ( 字段名可以自定义 )，表示进入这个路由是需要登录的
+      }
     },
     {
       path: '/commoditytype',
       name: '商品类别',
-      component: commoditytype
+      component: commoditytype,
+      meta: {
+        requireAuth: true // 添加该字段 ( 字段名可以自定义 )，表示进入这个路由是需要登录的
+      }
     },
     {
       path: '/shopmanage',
       name: '商户管理',
-      component: shopmanage
+      component: shopmanage,
+      meta: {
+        requireAuth: true // 添加该字段 ( 字段名可以自定义 )，表示进入这个路由是需要登录的
+      }
     },
     {
       path: '/evaluatemanage',
       name: '评论管理',
-      component: evaluatemanage
+      component: evaluatemanage,
+      meta: {
+        requireAuth: true // 添加该字段 ( 字段名可以自定义 )，表示进入这个路由是需要登录的
+      }
     },
     {
       path: '/usermanage',
       name: '用户管理',
-      component: usermanage
+      component: usermanage,
+      meta: {
+        requireAuth: true // 添加该字段 ( 字段名可以自定义 )，表示进入这个路由是需要登录的
+      }
     },
     {
       path: '/propertymanage',
-      name: '用户管理',
-      component: propertymanage
+      name: '资产管理',
+      component: propertymanage,
+      meta: {
+        requireAuth: true // 添加该字段 ( 字段名可以自定义 )，表示进入这个路由是需要登录的
+      }
     }
   ]
 })

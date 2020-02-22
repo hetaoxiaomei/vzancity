@@ -30,52 +30,52 @@
 
         <!--表单-->
         <template>
-            <el-table ref="multipleTable" :data="table" tooltip-effect="dark" border style="width:100%;border-bottom: 0;border-right:0;" @selection-change="handleSelectionChange">
-                <el-table-column prop="evaluateID" label="评论ID" width="80"></el-table-column>
-                <el-table-column prop="content" label="评论内容" show-overflow-tooltip></el-table-column>
-                <el-table-column prop="imgs" label="缩略图">
+            <el-table ref="multipleTable" :data="list" tooltip-effect="dark" border style="width:100%;border-bottom: 0;border-right:0;" @selection-change="handleSelectionChange">
+                <el-table-column prop="Id" label="评论ID" width="80"></el-table-column>
+                <el-table-column prop="Content" label="评论内容" show-overflow-tooltip></el-table-column>
+                <el-table-column prop="AttachmentList" label="缩略图">
                     <template slot-scope="scope">
-                        <img :src="item.src"  v-for="(item,index) in scope.row.imgs" :key="index" style="float:left; display:block;width:50px;margin:0 0 5px 5px;">
+                        <img :src="item.src" v-for="(item,index) in scope.row.AttachmentList" :key="index" class="thumbnail">
                     </template>
                 </el-table-column>
-                <el-table-column prop="star" label="评星" width="150">
+                <el-table-column prop="Star" label="评星" width="150">
                     <template slot-scope="scope">
-                        <el-rate v-model="scope.row.star" disabled disabled-void-color="#99A9BF"></el-rate>
+                        <el-rate v-model="scope.row.Star" disabled disabled-void-color="#99A9BF"></el-rate>
                     </template>
                 </el-table-column>
-                <el-table-column prop="userID" label="评论人" width="120">
+                <el-table-column label="评论人" width="120">
                     <template slot-scope="scope">
-                        <img :src="scope.row.userID.head" style="display:block;width:50px;height:50px;">
-                        <div style="display:block;">{{scope.row.userID.name}}</div>
+                        <img :src="scope.row.AvatarUrl" class="head-pic">
+                        <div style="display:block;">{{scope.row.NickName}}</div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="activityTitle" label="活动标题" width="120"></el-table-column>
-                <el-table-column prop="evaluateTime" label="评论时间" width="100"></el-table-column>
-                <el-table-column prop="reply" label="最新回复" width="120"></el-table-column>
-                <el-table-column prop="recommend" label="操作" width="120" >
+                <el-table-column prop="Title" label="活动标题" width="120"></el-table-column>
+                <el-table-column prop="AddTime" label="评论时间" width="100"></el-table-column>
+                <el-table-column prop="SubCommentList[0]" label="最新回复" width="120"></el-table-column>
+                <el-table-column label="操作" width="120" >
                     <template slot-scope="scope">
-                        <el-button type="primary" plain size="mini">{{scope.row.recommend?'设为推荐':'取消推荐'}}</el-button>
+                        <el-button type="primary" plain size="mini" v-if="isRecommend===1">设为推荐</el-button>
+                        <el-button type="danger" plain size="mini" v-else>取消推荐</el-button>
                     </template>
                 </el-table-column>
             </el-table>
         </template>
 
-        <!--分页-->
-        <template>
-            <div class="block" style="margin:20px 0 0;">
-                <el-pagination
-                    @size-change="handleSizeChange"
-                    @current-change="handleCurrentChange"
-                    :current-page="currentPage4"
-                    :page-sizes="[100, 200, 300, 400]"
-                    :page-size="100"
-                    layout="total, sizes, prev, pager, next, jumper"
-                    :total="400">
-                </el-pagination>
-            </div>
-        </template>
+      <!--分页栏-->
+      <div style="margin-top:20px;display:none;" v-show="count>0">
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="queryPara.pageIndex"
+          :page-sizes="[10, 20, 30, 40, 50]"
+          :page-size="10"
+          layout="total, sizes, prev, pager, next, jumper"
+          background
+          :total="count"
+        ></el-pagination>
+      </div>
 
-        <el-dialog title="状态变更" :visible.sync="dialogRecommendSeen" :show-close="false" width="250px" center>
+      <el-dialog title="状态变更" :visible.sync="dialogRecommendSeen" :show-close="false" width="250px" center>
             <p style="text-align:center;padding:10px 0;">{{dialogContent?'状态已修改为推荐':'已取消推荐'}}</p>
             <span slot="footer" class="dialog-footer">
             <el-button type="primary">确 定</el-button>
@@ -109,49 +109,12 @@ export default{
         ],
         date: ''
       },
-      table: [
-        {
-          evaluateID: '1752',
-          content: '真的好好吃',
-          imgs: [
-            {src: 'https://j.vzan.cc/content/city/img/skin_peeler/skin_nav01.png'},
-            {src: 'https://j.vzan.cc/content/city/img/skin_peeler/skin_nav01.png'},
-            {src: 'https://j.vzan.cc/content/city/img/skin_peeler/skin_nav01.png'}
-          ],
-          userID: {
-            head: 'https://j.vzan.cc/content/city/img/skin_peeler/skin_nav01.png',
-            name: '风有力（123123456）'
-          },
-          star: 4,
-          tel: '12345678912（已验证）',
-          userTitle: '普通用户',
-          activityTitle: '欢度春节重庆鸡公煲新春大酬宾原899元年夜饭套餐现价仅需499',
-          evaluateTime: '2019-12-12 18:00:21',
-          reply: '谢谢你的评论',
-          recommend: true
-        },
-        {
-          evaluateID: '1752',
-          content: '真的好好吃',
-          imgs: [
-            {src: 'https://j.vzan.cc/content/city/img/skin_peeler/skin_nav01.png'},
-            {src: 'https://j.vzan.cc/content/city/img/skin_peeler/skin_nav01.png'},
-            {src: 'https://j.vzan.cc/content/city/img/skin_peeler/skin_nav01.png'}
-          ],
-          userID: {
-            head: 'https://j.vzan.cc/content/city/img/skin_peeler/skin_nav01.png',
-            name: '风有力（123123456）'
-          },
-          star: 4,
-          tel: '12345678912（已验证）',
-          userTitle: '普通用户',
-          activityTitle: '欢度春节重庆鸡公煲新春大酬宾原899元年夜饭套餐现价仅需499',
-          evaluateTime: '2019-12-12 18:00:21',
-          reply: '谢谢你的评论',
-          recommend: false
-        }
-      ]
+      table: []
     }
   }
 }
 </script>
+<style>
+  .thumbnail{float:left;display:block;width:50px;margin:0 0 5px 5px;}
+  .head-pic{display:block;width:50px;height:50px;}
+</style>
