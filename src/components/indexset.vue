@@ -6,12 +6,13 @@
         <div>
           <div class="title-bar" style="margin:5px 0 0;">基础信息</div>
           <div style="padding: 0 0 0 20px;">
-            <el-form label-width="70px" class="formIndex" style="width:420px;">
+            <el-form :rules="rules" label-width="70px" class="formIndex" style="width:420px;">
               <div>
                 <div class="big-title">首页标题</div>
                 <el-form-item label="首页标题" style="margin:10px 0 0;">
                   <el-input
                     v-model.trim="form.IndexTitle"
+                    maxlength=4
                     placeholder="最多4个字，不填默认为“XX优选”"
                     size="medium"
                   ></el-input>
@@ -22,6 +23,7 @@
                 <el-form-item label="分享标题" style="margin:10px 0 0;" class="formIndex">
                   <el-input
                     v-model.trim="form.SharpTitle"
+                    maxlength=15
                     placeholder="最多15个字，不填默认为“XX优选-好吃好玩特划算”"
                     size="medium"
                   ></el-input>
@@ -34,10 +36,10 @@
                     :on-success="handleAvatarSuccess"
                     :before-upload="beforeAvatarUpload"
                   >
-                    <img v-if="form.imageUrl" :src="form.SharpImgUrl" class="avatar" />
+                    <img v-if="form.SharpImgUrl" :src="form.SharpImgUrl" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                   </el-upload>
-                  <p class="alert-f">推荐尺寸200*200，不更改默认为页面截图</p>
+                  <p class="alert-f" style="margin:-5px 0 0;">推荐尺寸200*200，不更改默认为页面截图</p>
                 </el-form-item>
               </div>
               <div>
@@ -53,7 +55,7 @@
                     <img v-if="form.imageQr" :src="form.KfQRCode" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                   </el-upload>
-                  <p class="alert-f">上传个人二维码，作为用户联系城主的方式</p>
+                  <p class="alert-f" style="margin:-5px 0 0;">上传个人二维码，作为用户联系城主的方式</p>
                 </el-form-item>
               </div>
               <el-button @click="saveBaseInforData()" type="primary" style="margin:20px 0 0 70px;padding:12px 50px;">保存</el-button>
@@ -392,6 +394,14 @@ export default {
         SharpImgUrl: '',
         KfQRCode: ''
       },
+      rules: {// 首页设置规则
+        IndexTitle: [
+          { required: true, message: '请输入首页标题', trigger: 'blur' }
+        ],
+        SharpTitle: [
+          { required: true, message: '请输入分享标题', trigger: 'blur' }
+        ]
+      },
       formIndexAd: {
         imageUrl: '',
         url: '',
@@ -508,8 +518,21 @@ export default {
         })
     },
     handleClick() {},
-    handleAvatarSuccess() {},
-    beforeAvatarUpload() {}
+    handleAvatarSuccess(res, file) {
+      this.form.SharpImgUrl = URL.createObjectURL(file.raw)
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === 'image/jpeg'
+      // const isLt2M = file.size / 1024 / 1024 < 2
+
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG 格式!')
+      }
+      // if (!isLt2M) {
+      //   this.$message.error('上传头像图片大小不能超过 2MB!')
+      // }
+      return isJPG
+    }
   },
   mounted: function() {},
   created: function() {
