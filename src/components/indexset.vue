@@ -6,7 +6,7 @@
         <div>
           <div class="title-bar" style="margin:5px 0 0;">基础信息</div>
           <div style="padding: 0 0 0 20px;">
-            <el-form :rules="rules" label-width="70px" class="formIndex" style="width:420px;">
+            <el-form label-width="70px" class="formIndex" style="width:420px;">
               <div>
                 <div class="big-title">首页标题</div>
                 <el-form-item label="首页标题" style="margin:10px 0 0;">
@@ -33,8 +33,8 @@
                     class="avatar-uploader"
                     action="https://jsonplaceholder.typicode.com/posts/"
                     :show-file-list="false"
-                    :on-success="handleAvatarSuccess"
-                    :before-upload="beforeAvatarUpload"
+                    :on-success="handleAvatarSuccess01"
+                    :before-upload="beforeAvatarUpload01"
                   >
                     <img v-if="form.SharpImgUrl" :src="form.SharpImgUrl" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -44,15 +44,15 @@
               </div>
               <div>
                 <div class="big-title">客服二维码</div>
-                <el-form-item label style="margin:10px 0 0;">
+                <el-form-item style="margin:10px 0 0;">
                   <el-upload
                     class="avatar-uploader"
                     action="https://jsonplaceholder.typicode.com/posts/"
                     :show-file-list="false"
-                    :on-success="handleAvatarSuccess"
-                    :before-upload="beforeAvatarUpload"
+                    :on-success="handleAvatarSuccess02"
+                    :before-upload="beforeAvatarUpload02"
                   >
-                    <img v-if="form.imageQr" :src="form.KfQRCode" class="avatar" />
+                    <img v-if="form.KfQRCode" :src="form.KfQRCode" class="avatar" />
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                   </el-upload>
                   <p class="alert-f" style="margin:-5px 0 0;">上传个人二维码，作为用户联系城主的方式</p>
@@ -66,7 +66,7 @@
         <div>
           <div class="title-bar" style="margin:40px 0 0;">首页轮播图</div>
           <div style="margin:20px 0 10px;">
-            <el-button type="primary" size="medium" @click="dialogAdFormVisible=true">新增轮播图</el-button>
+            <el-button type="primary" size="medium" @click="dialogIndexAdSeen=true">新增轮播图</el-button>
             <div class="alert-f" style="margin: 5px 0;">最多上传5张轮播图，不添加则展示默认宣传图片</div>
           </div>
           <!--表单list01-->
@@ -164,7 +164,7 @@
         <div style="padding: 0 0 0 20px;">
           <div class="d-flex d-flex-center" style="margin:20px 0;">
             <div style="margin-right: 12px;">功能开关</div>
-            <el-switch v-model="adValue"></el-switch>
+            <el-switch v-model="form.IsAdvert" :active-value='1' :inactive-value='0' @change="operateAdvert()"></el-switch>
           </div>
           <div style="margin:20px 0 10px;">
             <el-button type="primary" size="medium" @click="dialogAdFormVisible=true">添加广告</el-button>
@@ -192,7 +192,7 @@
               <el-table-column prop="ExpireTime" label="过期日期" width="140"></el-table-column>
               <el-table-column prop="Sort" label="排序" width="60"></el-table-column>
               <el-table-column label="操作" width="150">
-                <template slot-scope="scope">
+                <template>
                   <el-button type="primary" plain size="mini">编辑</el-button>
                   <el-button type="danger" plain size="mini">删除</el-button>
                 </template>
@@ -200,37 +200,19 @@
             </el-table>
           </template>
         </div>
-        <!--好店评价模块-->
-        <div class="title-bar">好店评价模块</div>
-        <div style="padding: 0 0 0 20px;">
-          <div class="d-flex d-flex-center" style="margin:20px 0 0;">
-            <div style="margin-right: 12px;">功能开关</div>
-            <el-switch v-model="goodShopEvaluate.value"></el-switch>
-          </div>
-          <div class="d-flex" style="margin:10px 0;">
-            <div style="margin-right: 12px;">显示规则</div>
-            <div class="flex">
-              <el-radio-group v-model="goodShopEvaluate.radio">
-                <el-radio :label="1">优先显示最新好评（四星以上评价）</el-radio>
-                <el-radio :label="2">优先显示置顶评价</el-radio>
-              </el-radio-group>
-            </div>
-          </div>
-        </div>
+
         <!--推荐好店模块-->
         <div class="title-bar">推荐好店模块</div>
         <div style="padding: 0 0 0 20px;">
           <div class="d-flex d-flex-center" style="margin:20px 0 0;">
             <div style="margin-right: 12px;">功能开关</div>
-            <el-switch v-model="goodShopRecommend.value"></el-switch>
+            <el-switch v-model="form.IsRecommend" :active-value='1' :inactive-value='0' @change="operateRecommend()"></el-switch>
           </div>
           <div class="d-flex" style="margin:10px 0;">
             <div style="margin-right: 12px;">显示规则</div>
             <div class="flex">
-              <el-radio-group v-model="goodShopRecommend.radio">
-                <el-radio :label="1">优先显示最新入驻店铺</el-radio>
-                <el-radio :label="2">优先显示置顶店铺</el-radio>
-              </el-radio-group>
+                <el-radio v-model="form.DisplayRule" :label="0" @change="displayRule()">优先显示最新入驻店铺</el-radio>
+                <el-radio v-model="form.DisplayRule" :label="1" @change="displayRule()">优先显示置顶店铺</el-radio>
             </div>
           </div>
         </div>
@@ -248,10 +230,11 @@
       <el-form :model="formIndexAd" label-width="70px">
         <el-upload
           class="avatar-uploader"
-          action="https://jsonplaceholder.typicode.com/posts/"
+          :action="webconfig.apiUrl + '/city/UploadImg?cityInfoId=' + queryPara.cityInfoId"
+          :headers="{'client_name':'2'}"
           :show-file-list="false"
-          :on-success="handleAvatarSuccess"
-          :before-upload="beforeAvatarUpload"
+          :on-success="handleAvatarSuccess03"
+          :before-upload="beforeAvatarUpload03"
           style="text-align:center"
         >
           <img v-if="formIndexAd.imageUrl" :src="formIndexAd.imageUrl" class="avatar" />
@@ -272,13 +255,13 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary">确 定</el-button>
+        <el-button @click="dialogIndexAdSeen = false">取 消</el-button>
+        <el-button type="primary" @click="saveAddIndexAdData()">确 定</el-button>
       </div>
     </el-dialog>
 
     <!--底部导航入口配置-->
-    <el-dialog title="入口配置" :visible.sync="dialogNavSeen" center width="350px">
+    <!-- <el-dialog title="入口配置" :visible.sync="dialogNavSeen" center width="350px">
       <el-form :model="formNav" label-width="70px">
         <el-upload
           class="avatar-uploader"
@@ -313,10 +296,10 @@
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary">确 定</el-button>
       </div>
-    </el-dialog>
+    </el-dialog> -->
 
     <!--店铺聚合页 上传首页轮播图-->
-    <el-dialog
+    <!-- <el-dialog
       title="上传轮播图"
       :visible.sync="dialogShopAdSeen"
       center
@@ -362,7 +345,8 @@
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
       </div>
-    </el-dialog>
+    </el-dialog> -->
+
   </div>
 </template>
 
@@ -372,7 +356,7 @@ import '../assets/css/city_backstage.css'
 export default {
   name: 'indexSet',
   mixins: [vueMixins], // 注册mixins
-  data() {
+  data: function() {
     return {
       activeName: 'first',
       adValue: false,
@@ -382,27 +366,24 @@ export default {
       radio: 1,
       queryPara: {
         // 用来请求
-        cityInfoId: 61165
+        cityInfoId: this.$cookie.get('cityInfoId')
       },
       list01: [],
       list02: [],
       list03: [],
       list04: [],
-      form: {// 首页设置
+      form: { // 首页设置
+        cityInfoId: this.$cookie.get('cityInfoId'),
         IndexTitle: '',
         SharpTitle: '',
         SharpImgUrl: '',
-        KfQRCode: ''
-      },
-      rules: {// 首页设置规则
-        IndexTitle: [
-          { required: true, message: '请输入首页标题', trigger: 'blur' }
-        ],
-        SharpTitle: [
-          { required: true, message: '请输入分享标题', trigger: 'blur' }
-        ]
+        KfQRCode: '',
+        IsAdvert: '',
+        IsRecommend: '',
+        DisplayRule: ''
       },
       formIndexAd: {
+        id: 0,
         imageUrl: '',
         url: '',
         sort: ''
@@ -424,7 +405,6 @@ export default {
         sort: '',
         outdate: ''
       },
-      goodShopEvaluate: { value: false, radio: 1 },
       goodShopRecommend: { value: false, radio: 1 }
     }
   },
@@ -440,11 +420,8 @@ export default {
       })
         .then(function (res) {
           if (res.data.code === 1) { // 获取数据成功
-            self.list01 = []
-            self.list01 = res.data.obj || []
           } else { // 获取数据失败
           }
-          self.loading = false
           console.log(res)
         })
         .catch(function (error) {
@@ -462,11 +439,8 @@ export default {
       })
         .then(function (res) {
           if (res.data.code === 1) { // 获取数据成功
-            self.list02 = []
-            self.list02 = res.data.obj || []
           } else { // 获取数据失败
           }
-          self.loading = false
           console.log(res)
         })
         .catch(function (error) {
@@ -479,16 +453,13 @@ export default {
       self.loading = true // 显示加载动画
       self.$axios({
         method: 'GET',
-        url: '/city/GetIndexButtonConfig',
+        url: '/city/GetBottomButtonConfig',
         params: self.queryPara
       })
         .then(function (res) {
           if (res.data.code === 1) { // 获取数据成功
-            self.list03 = []
-            self.list03 = res.data.obj || []
           } else { // 获取数据失败
           }
-          self.loading = false
           console.log(res)
         })
         .catch(function (error) {
@@ -506,11 +477,154 @@ export default {
       })
         .then(function (res) {
           if (res.data.code === 1) { // 获取数据成功
-            self.list04 = []
-            self.list04 = res.data.obj || []
           } else { // 获取数据失败
           }
-          self.loading = false
+          console.log(res)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
+    loadData05() {
+      // 保存修改数据
+      var self = this
+      // 请求数据
+      self.$axios({
+        method: 'GET',
+        url: '/city/GetCityConfig',
+        params: self.queryPara
+      })
+        .then(function (res) {
+          if (res.data.code === 1) { // 获取数据成功
+            self.form = res.data.obj
+          } else { // 获取数据失败
+            this.$message(res.data.msg)
+          }
+          console.log(res)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
+    saveBaseInforData() {
+      // 保存修改数据
+      var self = this
+      if (self.isNullOrEmpty(self.form.IndexTitle)) {
+        self.$message('首页标题不能为空')
+        return
+      }
+      if (self.isNullOrEmpty(self.form.SharpTitle)) {
+        self.$message('分享标题不能为空')
+        return
+      }
+      if (self.isNullOrEmpty(self.form.SharpImgUrl)) {
+        self.$message('分享图片不能为空')
+        return
+      }
+      if (self.isNullOrEmpty(self.form.KfQRCode)) {
+        self.$message('客服二维码不能为空')
+        return
+      }
+      // 请求数据
+      self.$axios({
+        method: 'POST',
+        url: '/city/SaveCityConfig',
+        params: self.form
+      })
+        .then(function (res) {
+          if (res.data.code === 1) { // 获取数据成功
+            self.$message('保存成功！')// 弹出提示
+          } else { // 获取数据失败
+            self.$message(res.data.msg) // 弹出删除失败提示
+          }
+          console.log(res)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
+    operateAdvert() {
+      // 加载数据
+      var self = this
+      self.loading = true // 显示加载动画
+      self.$axios({
+        method: 'POST',
+        url: '/city/OperateAdvert',
+        params: { IsAdvert: self.form.IsAdvert }// 对象
+      })
+        .then(function (res) {
+          if (res.data.code === 1) { // 获取数据成功
+            self.$message(res.data.msg)// 弹出提示
+          } else { // 获取数据失败
+            self.$message(res.data.msg) // 弹出删除失败提示
+          }
+          console.log(res)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
+    operateRecommend() {
+      // 加载数据
+      var self = this
+      self.loading = true // 显示加载动画
+      self.$axios({
+        method: 'POST',
+        url: '/city/OperateRecommend',
+        params: { IsRecommend: self.form.IsRecommend }// 对象
+      })
+        .then(function (res) {
+          if (res.data.code === 1) { // 获取数据成功
+            self.$message(res.data.msg)// 弹出提示
+          } else { // 获取数据失败
+            self.$message(res.data.msg) // 弹出删除失败提示
+          }
+          console.log(res)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
+    displayRule() {
+      // 加载数据
+      var self = this
+      self.loading = true // 显示加载动画
+      self.$axios({
+        method: 'POST',
+        url: '/city/OperateDisplayRule',
+        params: { DisplayRule: self.form.DisplayRule }// 对象
+      })
+        .then(function (res) {
+          if (res.data.code === 1) { // 获取数据成功
+            self.$message(res.data.msg)// 弹出提示
+          } else { // 获取数据失败
+            self.$message(res.data.msg) // 弹出删除失败提示
+          }
+          console.log(res)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
+    saveAddIndexAdData() {
+      // 保存修改数据
+      var self = this
+      if (self.isNullOrEmpty(self.form.imageUrl)) {
+        self.$message('请上传轮播图')
+        return
+      }
+      // 请求数据
+      self.$axios({
+        method: 'POST',
+        url: '/city/SaveIndexCarousel',
+        params: self.formIndexAd
+      })
+        .then(function (res) {
+          if (res.data.code === 1) { // 获取数据成功
+            self.$message('添加成功！')// 弹出提示
+          } else { // 获取数据失败
+            self.$message(res.data.msg) // 弹出删除失败提示
+          }
           console.log(res)
         })
         .catch(function (error) {
@@ -518,21 +632,49 @@ export default {
         })
     },
     handleClick() {},
-    handleAvatarSuccess(res, file) {
+    handleAvatarSuccess01(res, file) {
       this.form.SharpImgUrl = URL.createObjectURL(file.raw)
     },
-    beforeAvatarUpload(file) {
+    beforeAvatarUpload01(file) {
       const isJPG = file.type === 'image/jpeg'
-      // const isLt2M = file.size / 1024 / 1024 < 2
-
       if (!isJPG) {
-        this.$message.error('上传头像图片只能是 JPG 格式!')
+        this.$message.error('上传头像图片只能是 JPG和png 格式!')
       }
-      // if (!isLt2M) {
-      //   this.$message.error('上传头像图片大小不能超过 2MB!')
-      // }
+      return isJPG
+    },
+    handleAvatarSuccess02(res, file) {
+      this.form.KfQRCode = URL.createObjectURL(file.raw)
+    },
+    beforeAvatarUpload02(file) {
+      const isJPG = file.type === 'image/jpeg'
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG和png 格式!')
+      }
+      return isJPG
+    },
+    handleAvatarSuccess03(res, file) {
+      this.formIndexAd.KfQRCode = URL.createObjectURL(file.raw)
+    },
+    beforeAvatarUpload03(file) {
+      const isJPG = file.type === 'image/jpeg'
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG和png 格式!')
+      }
       return isJPG
     }
+
+    // self.$axios.post('此处请输入接口链接，请询问后端开发', self.editItem, function (res) {
+    //   if (res.code === 1) { // 修改数据成功
+    //     self.$message('修改成功！')// 弹出提示
+    //   } else { // 修改数据失败
+    //     self.$message(res.msg)// 弹出删除失败提示
+    //     setTimeout(function () {
+    //       location.reload()// 刷新页面
+    //     }, 2000)
+    //   }
+    //   self.dialogVisible = false// 关闭窗口
+    // })
+
   },
   mounted: function() {},
   created: function() {
@@ -543,3 +685,7 @@ export default {
   }
 }
 </script>
+<style>
+.el-radio{margin: 10px 0px 0px;display: block}
+.el-radio:first-child{margin: 2px 0px 0px;}
+</style>

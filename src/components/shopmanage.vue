@@ -1,5 +1,5 @@
 <template>
-  <div id="shopManage" class="iframe_body">
+  <div class="iframe_body">
     <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
       <el-tab-pane label="商家管理" name="first">
         <el-form :inline="true" :model="formInline" class="demo-form-inline table-serch">
@@ -24,7 +24,7 @@
               <span class="demonstration">入驻时间：</span>
               <el-date-picker
                 unlink-panels="false"
-                v-model="value1"
+                v-model="formInline.value1"
                 type="daterange"
                 range-separator="至"
                 size="small"
@@ -34,7 +34,7 @@
               <span class="demonstration">过期时间：</span>
               <el-date-picker
                 unlink-panels="false"
-                v-model="value2"
+                v-model="formInline.value2"
                 type="daterange"
                 range-separator="至"
                 size="small"
@@ -53,7 +53,6 @@
         <template>
           <el-table
             ref="multipleTable"
-            :data="list"
             tooltip-effect="dark"
             border
             style="width:100%;border-bottom: 0;border-right:0;"
@@ -101,19 +100,17 @@
               </a>
             </el-table-column>
           </el-table>
-        </template>
-
-        <!--分页-->
-        <template>
-          <div class="block" style="margin:20px 0 0;">
+          <!--分页栏-->
+          <div style="margin-top:20px;display:none;" v-show="count>0">
             <el-pagination
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
-              :current-page="currentPage4"
-              :page-sizes="[100, 200, 300, 400]"
-              :page-size="100"
+              :current-page="queryPara.pageIndex"
+              :page-sizes="[10, 20, 30, 40, 50]"
+              :page-size="10"
               layout="total, sizes, prev, pager, next, jumper"
-              :total="400"
+              background
+              :total="count"
             ></el-pagination>
           </div>
         </template>
@@ -127,7 +124,6 @@
         <template>
           <el-table
             ref="multipleTable"
-            :data="list02"
             tooltip-effect="dark"
             border
             style="width:700px;border-bottom: 0;border-right:0;"
@@ -199,7 +195,6 @@
               action="https://jsonplaceholder.typicode.com/posts/"
               list-type="picture-card"
               :limit="5"
-              :on-exceed="handleExceed"
             >
               <i class="el-icon-plus" style="line-height:98px;"></i>
             </el-upload>
@@ -223,7 +218,6 @@
         <template>
           <el-table
             ref="multipleTable"
-            :data="list03"
             tooltip-effect="dark"
             border
             style="width:800px;border-bottom: 0;border-right:0;"
@@ -357,34 +351,28 @@
         <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
       </div>
     </el-dialog>
-
-    <!--确认删除弹框-->
-    <el-dialog
-      :title="dialogDelete.title"
-      center
-      :visible.sync="dialogDeleteSeen"
-      :show-close="false"
-      width="350px"
-    >
-      <div style="margin:0 0 20px;">
-        <p style="text-align:center;padding:10px 0 0;font-size:16px;">{{dialogDelete.content}}</p>
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <el-button v-show="dialogDelete.cancelBt">取 消</el-button>
-        <el-button type="primary">确 定</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 <script>
 import { vueMixins } from '../assets/js/mixins.js'
 import '../assets/css/city_backstage.css'
-export default{
-  name: 'shopManage',
+export default {
+  name: 'commodityManage',
   mixins: [vueMixins], // 注册mixins
-  data() {
+  data: function() {
     return {
-      activeName: 'forth',
+      activeName: 'first',
+      count: 0, // 数据条数，用来分页
+      queryPara: {
+        // 用来请求
+        cityInfoId: 0,
+        pageIndex: 1,
+        pageSize: 10
+      },
+      list01: [],
+      list02: [],
+      list03: [],
+      dialogVisible: false,
       dialogModifyOutdateSeen: false,
       dialogModifyOwnerSeen: false,
       dialogModifyTopSeen: false,
@@ -394,7 +382,8 @@ export default{
       dialogRecommendSeen: false,
       dialogContent: false,
       dialogIndex: '',
-      formInline: {// 搜索筛选
+      formInline: {
+        // 搜索筛选
         userID: '',
         Name: '',
         url: '',
@@ -407,108 +396,132 @@ export default{
         value1: '',
         value2: ''
       },
-      tableShopManage: [// 商家管理表格
-        {
-          evaluateID: '1752',
-          name: '重庆鸡公煲东站店',
-          ownerInfor: {
-            head: 'https://j.vzan.cc/content/city/img/skin_peeler/skin_nav01.png',
-            name: '风有力（123123456）'
-          },
-          area: '天河区',
-          type: '生活服务',
-          settleDate: '2019-12-12 18:00:21',
-          outDate: '2020-12-12 18:00:21',
-          percentage: '10%',
-          top: '是'
-        },
-        {
-          evaluateID: '1752',
-          name: '重庆鸡公煲东站店',
-          ownerInfor: {
-            head: 'https://j.vzan.cc/content/city/img/skin_peeler/skin_nav01.png',
-            name: '风有力（123123456）'
-          },
-          area: '天河区',
-          type: '生活服务',
-          settleDate: '2019-12-12 18:00:21',
-          outDate: '2020-12-12 18:00:21',
-          percentage: '10%',
-          top: '是'
-        }
-      ],
-      formModifyOutdate: {// 修改过期
+      formModifyOutdate: {
+        // 修改过期
         startTime: '',
         endeTime: ''
       },
-      formModifyOwner: {// 修改店主
+      formModifyOwner: {
+        // 修改店主
         ID: '',
         percentage: '10'
       },
-      tableShopType: [// 商家分类
-        {
-          ID: '1783',
-          name: '美食',
-          link: '/admini/store/1',
-          sort: '99'
-        }
-      ],
-      formShopType: {// 商家分类编辑
+      formShopType: {
+        // 商家分类编辑
         name: '',
         sort: ''
       },
-      formInputshop: {// 录入商家
+      formInputshop: {
+        // 录入商家
         name: '',
         type: '美食',
         typeOptions: [
-          {value: '选项一', option: '美食'},
-          {value: '选项二', option: '零食'},
-          {value: '选项三', option: '教育'}
+          { value: '选项一', option: '美食' },
+          { value: '选项二', option: '零食' },
+          { value: '选项三', option: '教育' }
         ],
         area: '',
         areaOption01: [
-          {value: '选项一', option: '广州'},
-          {value: '选项二', option: '佛山'},
-          {value: '选项三', option: '深圳'}
+          { value: '选项一', option: '广州' },
+          { value: '选项二', option: '佛山' },
+          { value: '选项三', option: '深圳' }
         ],
         areaOption02: [
-          {value: '选项一', option: '荔湾'},
-          {value: '选项二', option: '天河'},
-          {value: '选项三', option: '番禺'}
+          { value: '选项一', option: '荔湾' },
+          { value: '选项二', option: '天河' },
+          { value: '选项三', option: '番禺' }
         ],
         address: '',
         tel: '',
         dialogImageUrl: '',
         businessHours: ''
-      },
-      tableSettleIntention: [// 入驻意向登记
-        {
-          ID: '1234',
-          nickname: '哈哈哈哈',
-          name: '孙文',
-          tel: '12345678912',
-          reason: '我想创建个店铺,卖海鲜',
-          state: '已处理',
-          bt01: true,
-          bt02: true
-        }
-      ],
-      dialogDelete: {
-        title: '确认删除',
-        content: '删除该分类后，该分类相关的店铺会归为无分类',
-        cancelBt: true,
-        center: true
       }
     }
   },
   methods: {
+    loadData01() {
+      // 加载数据
+      var self = this
+      self.loading = true // 显示加载动画
+      self
+        .$axios({
+          method: 'GET',
+          url: '/city/GetStoreList',
+          params: self.queryPara
+        })
+        .then(function(res) {
+          if (res.data.code === 1) {
+            // 获取数据成功
+          } else {
+            // 获取数据失败
+          }
+          console.log(res)
+        })
+        .catch(function(error) {
+          console.log(error)
+        })
+    },
+    loadData02() {
+      // 加载数据
+      var self = this
+      self.loading = true // 显示加载动画
+      self
+        .$axios({
+          method: 'GET',
+          url: '/city/GetStoreTypeList',
+          params: self.queryPara
+        })
+        .then(function(res) {
+          if (res.data.code === 1) {
+            // 获取数据成功
+          } else {
+            // 获取数据失败
+          }
+          console.log(res)
+        })
+        .catch(function(error) {
+          console.log(error)
+        })
+    },
+    loadData03() {
+      // 加载数据
+      var self = this
+      self.loading = true // 显示加载动画
+      self
+        .$axios({
+          method: 'GET',
+          url: '/city/GetIntentionList',
+          params: self.queryPara
+        })
+        .then(function(res) {
+          if (res.data.code === 1) {
+            // 获取数据成功
+          } else {
+            // 获取数据失败
+          }
+          console.log(res)
+        })
+        .catch(function(error) {
+          console.log(error)
+        })
+    },
+    handleRemove(file) {
+      console.log(file)
+    },
+    handlePictureCardPreview(file) {
+      this.formInputshop.dialogImageUrl = file.url
+      this.dialogVisible = true
+    },
+    handleDownload(file) {
+      console.log(file)
+    },
     handleClick: function(index) {
       var self = this
       if (self.table[index].recommend === true) {
         self.dialogContent = true
       } else {
         self.dialogContent = false
-      };
+      }
       self.dialogRecommendSeen = true
       self.dialogIndex = index
     },
@@ -520,6 +533,10 @@ export default{
     }
   },
   mounted: function() {},
-  created: function () {}
+  created: function() {
+    // this.loadData01()
+    // this.loadData02()
+    // this.loadData03()
+  }
 }
 </script>

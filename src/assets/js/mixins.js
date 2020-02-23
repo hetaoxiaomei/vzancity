@@ -1,9 +1,6 @@
 /* eslint-disable no-undef */
 export let vueMixins = {
-  dat: {
-    webconfig: {
-      domain: 'http://ms-city.vzan.com'
-    },
+  data: {
     mImgType: 'default',
     mImgCount: 9,
     mImgList: [],

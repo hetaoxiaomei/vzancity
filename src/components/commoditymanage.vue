@@ -196,7 +196,7 @@ export default {
       },
       queryPara: {
         // 用来请求
-        cityInfoId: 61165,
+        cityInfoId: this.$cookie.get('cityInfoId'),
         pageIndex: 1,
         pageSize: 10,
         isSell: '',
@@ -246,63 +246,6 @@ export default {
         .catch(function (error) {
           console.log(error)
         })
-      // 请求数据
-      // this.$http.post(self.webconfig.domain + '/city/GetGoodsList', this.queryPara, function (res) {
-      //   if (res.code === 1) { // 获取数据成功
-      //     self.list = []
-      //     self.list = res.data || []
-      //     self.count = res.count
-      //   } else { // 获取数据失败
-      //     self.count = 0
-      //   }
-      //   self.loading = false
-      // })
-
-      // 此处模拟上面的根据接口成功获取数据
-      // var list = [
-      //   {
-      //     Id: 123,
-      //     ImgUrl: 'https://i.vzan.cc/image/jpg/2017/12/18/1913525ddfba50b89a435fa0bacf1f5971c368.jpg@!640x210',
-      //     Name: '小陈',
-      //     Price: '125',
-      //     Stock: '10',
-      //     SalesNum: '12',
-      //     BrowseNum: '52',
-      //     AddTime: '2019-12-31 12:40:50',
-      //     Status: 1,
-      //     IsSell: 1,
-      //     Sort: '52'
-      //   },
-      //   {
-      //     Id: 124,
-      //     ImgUrl: 'https://i.vzan.cc/image/jpg/2017/12/18/1913525ddfba50b89a435fa0bacf1f5971c368.jpg@!640x210',
-      //     Name: '小陈',
-      //     Price: '125',
-      //     Stock: '10',
-      //     SalesNum: '12',
-      //     BrowseNum: '52',
-      //     AddTime: '2019-12-31 12:40:50',
-      //     Status: 0,
-      //     IsSell: 0,
-      //     Sort: '52'
-      //   },
-      //   {
-      //     Id: 125,
-      //     ImgUrl: 'https://i.vzan.cc/image/jpg/2017/12/18/1913525ddfba50b89a435fa0bacf1f5971c368.jpg@!640x210',
-      //     Name: '小陈',
-      //     Price: '125',
-      //     Stock: '10',
-      //     SalesNum: '12',
-      //     BrowseNum: '52',
-      //     AddTime: '2019-12-31 12:40:50',
-      //     Status: 1,
-      //     IsSell: 0,
-      //     Sort: '52'
-      //   }
-      // ]
-      // self.list = list
-      // self.loading = false // 关闭加载动画
-      // self.count = 11
     },
     handleClick() {
       // 切换导航

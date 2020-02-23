@@ -5,7 +5,7 @@ import cookie from 'vue-cookie'
 export default {
   install(Vue, options) {
     Vue.prototype.webconfig = {
-      apiUrl: 'http://ms-city.vzan.com'
+      apiUrl: 'http://ms-city.vzan.com/city'
     }
 
     axios.defaults.baseURL = 'http://ms-city.vzan.com/city'
@@ -15,7 +15,8 @@ export default {
         config.data = JSON.stringify(config.data)
         config.headers = {
           'Content-Type': 'application/json',
-          'client_name': '2'
+          'client_name': '2',
+          'cityInfoId': cookie.get('cityInfoId')
         }
         return config
       },
