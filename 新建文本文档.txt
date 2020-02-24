@@ -1,0 +1,21 @@
+exportTable() {
+                if (this.list.length > 0) {
+                    var html = [];
+                    html.push(`,同城ID,同城名称,版本,省,市,区,使用状态,首次开通时间,到期时间,总流水,分类信息总数,信息付费发布数,置顶次数,发帖付费并置顶次数,刷新次数,分类信息总收入,商家入驻数,营销活动数量,营销活动总收入,抢优惠活动数量,抢优惠活动收入,拼团活动数量,拼团活动收入,爱心价活动数量,爱心价活动收入,减价活动数量,减价活动总收入,投票活动数量,投票活动收入\n`);
+                    for (var i = 0; i < this.list.length; i++) {
+                        var item = this.list[i];
+                        if (item) {
+                            html.push(`${item.AreaCode},${item.CName},${item.CityType},${item.Address.Province},${item.Address.City},${item.Address.Area},${item.State},${item.CreateDate.substring(0, 10)},${item.EndDate.substring(0, 10)},${(item.TotalIncome * 0.01).toFixed(2)},${item.ArticleNum},${item.PayPublishNum},${item.PayIndexNum},${item.PayAndIndexNum},${item.PayRefreshNum},${(item.InfoIncome * 0.01).toFixed(2)},${item.StoreCount},${item.CouponNum + item.GroupNum + item.LikeNum + item.BargainNum},${(item.ActivityIncome * 0.01).toFixed(2)},${item.CouponNum},${(item.CouponIncome * 0.01).toFixed(2)},${item.GroupNum},${(item.GroupIncome * 0.01).toFixed(2)},${item.LikeNum},${(item.LikeIncome * 0.01).toFixed(2)},${item.BargainNum},${(item.BargainIncome * 0.01).toFixed(2)},${item.VoteNum},${(item.VoteIncome * 0.01).toFixed(2)}\n`);
+                        }
+                    }
+                    var uri = 'data:text/csv;charset=utf-8,\ufeff' + encodeURIComponent(html.toString());
+                    //通过创建a标签实现
+                    var link = document.createElement("a");
+                    link.href = uri;
+                    //对下载的文件命名
+                    link.download = "同城统计数据.csv";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }                
+            },

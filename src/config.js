@@ -9,6 +9,7 @@ export default {
     }
 
     axios.defaults.baseURL = 'http://ms-city.vzan.com/city'
+    // axios.defaults.baseURL = 'http://192.168.30.181:58002/city'
     // axios.defaults.withCredentials = true
     axios.interceptors.request.use(
       config => {

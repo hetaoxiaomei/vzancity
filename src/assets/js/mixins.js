@@ -1,17 +1,19 @@
 /* eslint-disable no-undef */
 export let vueMixins = {
-  data: {
-    mImgType: 'default',
-    mImgCount: 9,
-    mImgList: [],
-    queryPara: {
-      cityInfoId: 0,
-      storeId: 0,
-      areaCode: 0,
-      pageIndex: 1,
-      pageSize: 10
-    },
-    mEditor: ''
+  data() {
+    return {
+      mImgType: 'default',
+      mImgCount: 9,
+      mImgList: [],
+      queryPara: {
+        cityInfoId: 0,
+        storeId: 0,
+        areaCode: 0,
+        pageIndex: 1,
+        pageSize: 10
+      },
+      mEditor: ''
+    }
   },
   methods: {
     handleSizeChange(pageSize) {

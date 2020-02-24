@@ -136,4 +136,6 @@ body, html {
 
 .big-title{font-size:20px;font-weight:bold;margin:20px 0 0;}
 
+.el-upload-list--picture-card .el-upload-list__item-status-label i{position: absolute;top: -1px;left: 14px;}
 
+.blue-text-bt{position:relative;line-height:1;margin:0 0 0 5px;color:#409EFF !important;}
