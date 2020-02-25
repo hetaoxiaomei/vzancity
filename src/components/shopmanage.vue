@@ -239,7 +239,7 @@
           </el-form-item>
           <el-row style="margin:20px 0 0 90px;">
             <el-button type="primary" @click="saveShopSetData()">保存</el-button>
-            <el-button plain @click="cancelShopSet()">取消</el-button>
+            <el-button plain @click="cleanShopSet()">取消</el-button>
           </el-row>
         </el-form>
       </el-tab-pane>
@@ -248,22 +248,34 @@
         <div style="font-size:14px;margin:0 0 10px;">页面地址：/admini/insetstore/2</div>
         <template>
           <el-table
+            v-if="list03.length>0"
             ref="multipleTable"
             tooltip-effect="dark"
             :data="list03"
             border
             style="width:800px;"
           >
-            <el-table-column prop="UserId" label="用户ID" width="80"></el-table-column>
-            <el-table-column prop="Name" label="用户昵称" width="120"></el-table-column>
+            <el-table-column prop="Id" label="用户ID" width="80"></el-table-column>
+            <el-table-column label="用户昵称" width="120">
+              <template slot-scope="scope">
+                <span>{{scope.row.UserInfo.NickName}}</span>
+              </template>
+            </el-table-column>
             <el-table-column prop="Name" label="提交姓名" width="120"></el-table-column>
             <el-table-column prop="Phone" label="提交电话" width="120"></el-table-column>
             <el-table-column prop="Reason" label="提交理由"></el-table-column>
-            <el-table-column prop="Status" label="状态" width="80"></el-table-column>
+            <el-table-column prop="Status" label="状态" width="80">
+              <template slot-scope="scope">
+                <span v-if="scope.row.Status==2">已忽略</span>
+                <span v-else-if="scope.row.Status==1">已处理</span>
+                <span v-else>待处理</span>
+              </template>
+            </el-table-column>
             <el-table-column label="操作" width="110">
               <template slot-scope="scope">
                 <el-button
                   v-if="scope.row.Status==1||scope.row.Status==0"
+                  @click="setIgnore()"
                   type="primary"
                   plain
                   size="mini"
@@ -465,6 +477,7 @@ export default {
         })
         .then(function(res) {
           if (res.data.code === 1) {
+            self.list01 = res.data.obj
             // 获取数据成功
           } else {
             // 获取数据失败
@@ -502,15 +515,15 @@ export default {
       // 加载数据
       var self = this
       self.loading = true // 显示加载动画
-      self
-        .$axios({
-          method: 'GET',
-          url: '/city/GetIntentionList',
-          params: self.queryPara
-        })
+      self.$axios({
+        method: 'GET',
+        url: '/city/GetIntentionList',
+        params: self.queryPara
+      })
         .then(function(res) {
           if (res.data.code === 1) {
             // 获取数据成功
+            self.list03 = res.data.obj
           } else {
             // 获取数据失败
           }
@@ -613,6 +626,30 @@ export default {
     saveShopSetData() { // 保存录入商家
 
     },
+    setIgnore(row) { // 设为忽略
+      var self = this
+      var str = '确定设为忽略?'
+      this.$confirm(str, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        self.$axios({
+          method: 'GET',
+          url: '/city/GetIntentionList',
+          params: { cityInfoId: self.queryPara.cityInfoId, id: row.Id, status: 2 }// 对象
+        })
+          .then(function (res) {
+            if (res.data.code === 1) { // 获取数据成功
+              self.$message(res.data.msg)
+            } else { // 获取数据失败
+              self.$message(res.data.msg) // 弹出删除失败提示
+            }
+            console.log(res)
+          })
+      }).catch(() => {
+      })
+    },
     // handlePictureCardPreview(file) {
     //   this.form02.dialogImageUrl = file.url
     //   this.dialogVisible = true
@@ -629,6 +666,8 @@ export default {
     handleClick: function(event) {
       if (event.index === '1') {
         this.loadData02()
+      }
+      if (event.index === '3') {
       }
     },
     OKBtn: function(index) {

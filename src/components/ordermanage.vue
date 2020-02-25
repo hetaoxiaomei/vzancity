@@ -11,7 +11,7 @@
                     </el-form-item>
                     <el-form-item label="订单类型：" size="small" style="margin:0 0 0 10px">
                         <el-select v-model="formOrder.type" style="width:100%" @change="change">
-                            <el-option v-for="item,index in formOrder.typeOptions" :label="item.option" :value="item.value">
+                            <el-option v-for="(item,index) in formOrder.typeOptions" :label="item.option" :value="item.value" :key="index">
                             </el-option>
                         </el-select>
                     </el-form-item>
@@ -46,7 +46,7 @@
                     <el-table-column label="操作" width="120"></el-table-column>
                 </el-table>
 
-                <div v-for="item,index in orders" style="margin:10px 0 0;">
+                <div v-for="(item,index) in orders" :key="index" style="margin:10px 0 0;">
                     <div class="d-flex d-flex-center" style="background:#f0f0f0;padding:10px;">
                         <div style="margin:0 20px 0 0;">下单时间：{{item.date}}</div>
                         <div style="margin:0 20px 0 0;">订单编号：{{item.number}}</div>
@@ -92,20 +92,19 @@
 
         </el-tabs>
 
-        <!--分页-->
-        <template>
-            <div class="block" style="margin:20px 0 0;">
-                <el-pagination
-                    @size-change="handleSizeChange"
-                    @current-change="handleCurrentChange"
-                    :current-page="currentPage4"
-                    :page-sizes="[100, 200, 300, 400]"
-                    :page-size="100"
-                    layout="total, sizes, prev, pager, next, jumper"
-                    :total="400">
-                </el-pagination>
-            </div>
-        </template>
+        <!--分页栏-->
+        <div style="margin-top:20px;display:none;" v-show="count>0">
+        <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="queryPara.pageIndex"
+            :page-sizes="[10, 20, 30, 40, 50]"
+            :page-size="10"
+            layout="total, sizes, prev, pager, next, jumper"
+            background
+            :total="count"
+        ></el-pagination>
+        </div>
 
     </div>
 </template>
