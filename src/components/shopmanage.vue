@@ -2,19 +2,19 @@
   <div class="iframe_body">
     <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
       <el-tab-pane label="商家管理" name="first">
-        <el-form :inline="true" :model="form01" class="demo-form-inline table-serch">
+        <el-form :inline="true" class="demo-form-inline table-serch">
           <el-form-item label="商家ID：" size="small" style="margin:0">
-            <el-input v-model="form01.userID" placeholder="请输入商家ID" style="width:180px;"></el-input>
+            <el-input v-model="queryPara.storeId" placeholder="请输入商家ID" style="width:180px;"></el-input>
           </el-form-item>
           <el-form-item label="商家名称：" size="small" style="margin:0 0 0 10px">
-            <el-input v-model="form01.Name" placeholder="请输入商家名称" style="width:180px;"></el-input>
+            <el-input v-model="queryPara.name" placeholder="请输入商家名称" style="width:180px;"></el-input>
           </el-form-item>
           <el-form-item label="商家分类：" size="small" style="margin:0 0 0 10px">
-            <el-select v-model="form01.StoreType" style="width:100%">
+            <el-select v-model="queryPara.type" style="width:100%">
               <el-option
-                v-for="(item,index) in form01.urlOptions"
-                :label="item.option"
-                :value="item.value"
+                v-for="(item,index) in list02"
+                :label="item.TypeName"
+                :value="item.Id"
                 :key="index"
               ></el-option>
             </el-select>
@@ -23,35 +23,35 @@
             <div style="display:inline-block;color:#606266">
               <span class="el-form-item__label">入驻时间：</span>
               <el-date-picker size="small" style="width:180px"
-                v-model="form01.settleDate01"
+                v-model="queryPara.entryStartDate"
                 type="date">
               </el-date-picker>
               <span>至</span>
               <el-date-picker size="small" style="width:180px"
-                v-model="form01.settleDate02"
+                v-model="queryPara.entryEndDate"
                 type="date">
               </el-date-picker>
             </div>
             <div style="display:inline-block;margin:0 0 0 10px">
               <span class="el-form-item__label">过期时间：</span>
               <el-date-picker size="small" style="width:180px"
-                v-model="form01.outDate01"
+                v-model="queryPara.expireStartDate"
                 type="date">
               </el-date-picker>
               <span>至</span>
               <el-date-picker size="small" style="width:180px"
-                v-model="form01.outDate02"
+                v-model="queryPara.expireEndDate"
                 type="date">
               </el-date-picker>
             </div>
             <el-row style="display:inline-block;margin:0 0 0 10px">
-              <el-button size="small">清空条件</el-button>
-              <el-button type="primary" size="small" style="padding:9px 30px;">筛选</el-button>
+              <el-button size="small" @click="clean()">清空条件</el-button>
+              <el-button type="primary" @click="search()" size="small" style="padding:9px 30px;">搜索</el-button>
             </el-row>
           </div>
         </el-form>
         <div style="margin:20px 0 10px;">
-          <el-button type="primary" size="medium" @click="dialogAdFormVisible=true">新增商家</el-button>
+            <el-button type="primary" size="medium" @click="activeName = 'third'">新增商家</el-button>
         </div>
         <!--表单-->
         <template>
@@ -155,13 +155,13 @@
           <el-form-item label="商家分类" size="medium" style="margin:10px 0 0;">
             <el-select v-model="form02.StoreType" style="width:200px">
               <el-option
-                v-for="(item,index) in form02.typeOptions"
-                :label="item.option"
-                :value="item.value"
+                v-for="(item,index) in list02"
+                :label="item.TypeName"
+                :value="item.Id"
                 :key="index"
               ></el-option>
             </el-select>
-            <el-link class="blue-text-bt">添加分类</el-link>
+            <el-link class="blue-text-bt" @click="activeName='second'">添加分类</el-link>
           </el-form-item>
           <el-form-item label="商家区域" size="medium" style="margin:10px 0 0;">
             <el-select v-model="form02.ProvinceId" style="width:200px;display:inline-block;">
@@ -197,7 +197,7 @@
             <el-input v-model.trim="form02.Phone" style="width:200px;"></el-input>
           </el-form-item>
           <el-form-item label="商家轮播图" style="margin:10px 0 0;">
-            <!-- <el-upload
+            <el-upload
               class="swiper-banner"
               action="https://jsonplaceholder.typicode.com/posts/"
               list-type="picture-card"
@@ -207,7 +207,7 @@
               :file-list="form02.NewAlbums"
             >
               <i class="el-icon-plus" style="line-height:98px;"></i>
-            </el-upload> -->
+            </el-upload>
             <!-- <el-upload
               action="#"
               list-type="picture-card"
@@ -253,7 +253,6 @@
             :data="list03"
             border
             style="width:800px;"
-            @selection-change="handleSelectionChange"
           >
             <el-table-column prop="UserId" label="用户ID" width="80"></el-table-column>
             <el-table-column prop="Name" label="用户昵称" width="120"></el-table-column>
@@ -285,7 +284,7 @@
     </el-tabs>
 
     <!--商家管理修改过期弹框-->
-    <!-- <el-dialog
+    <el-dialog
       title="修改过期"
       :visible.sync="dialogModifyOutdateSeen"
       :show-close="false"
@@ -303,12 +302,12 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogShopTypeSeen = false">取 消</el-button>
-        <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
+        <el-button type="primary">确 定</el-button>
       </div>
-    </el-dialog> -->
+    </el-dialog>
 
     <!--商家管理修改店主弹框-->
-    <!-- <el-dialog
+    <el-dialog
       title="修改店主"
       :visible.sync="dialogModifyOwnerSeen"
       :show-close="false"
@@ -338,9 +337,9 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogShopTypeSeen = false">取 消</el-button>
-        <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
+        <el-button type="primary">确 定</el-button>
       </div>
-    </el-dialog> -->
+    </el-dialog>
 
     <!--商家分类编辑弹框-->
     <el-dialog
@@ -385,27 +384,18 @@ export default {
         // 用来请求
         cityInfoId: this.$cookie.get('cityInfoId'),
         pageIndex: 1,
-        pageSize: 10
+        pageSize: 10,
+        storeId: '',
+        name: '',
+        type: '',
+        entryStartDate: '',
+        entryEndDate: '',
+        expireStartDate: '',
+        expireEndDate: ''
       },
       list01: [],
       list02: [],
       list03: [],
-      form01: {
-        // 搜索筛选
-        userID: '',
-        Name: '',
-        settleDate01: '',
-        settleDate02: '',
-        outDate01: '',
-        outDate02: '',
-        StoreType: '',
-        urlOptions: [
-          {
-            value: '1',
-            option: '好'
-          }
-        ]
-      },
       form02: {
         StoreName: '',
         StoreType: '',
@@ -530,6 +520,39 @@ export default {
           console.log(error)
         })
     },
+    clean() { // 清空条件
+      this.queryPara.pageIndex = 1
+      this.queryPara.pageSize = 10
+      this.queryPara.storeId = ''
+      this.queryPara.name = ''
+      this.queryPara.type = ''
+      this.queryPara.entryStartDate = ''
+      this.queryPara.entryEndDate = ''
+      this.queryPara.expireStartDate = ''
+      this.queryPara.expireEndDate = ''
+      this.loadData01()
+    },
+    search () { // 搜索商家数据
+      var self = this
+      self.loading = true // 显示加载动画
+      self
+        .$axios({
+          method: 'GET',
+          url: '/city/GetStoreList',
+          params: self.queryPara
+        })
+        .then(function(res) {
+          if (res.data.code === 1) {
+            // 获取数据成功
+          } else {
+            // 获取数据失败
+          }
+          console.log(res)
+        })
+        .catch(function(error) {
+          console.log(error)
+        })
+    },
     showEditShopType(index, row) { // 打开编辑店铺类别弹框
       var self = this
       self.form03.TypeName = row.TypeName
@@ -591,7 +614,7 @@ export default {
 
     },
     // handlePictureCardPreview(file) {
-    //   this.formInputshop.dialogImageUrl = file.url
+    //   this.form02.dialogImageUrl = file.url
     //   this.dialogVisible = true
     // },
     // handleDownload(file) {
@@ -617,8 +640,9 @@ export default {
   },
   mounted: function() {},
   created: function() {
-    // this.loadData01()    
-    // this.loadData03()
+    this.loadData01()
+    this.loadData02()
+    this.loadData03()
   }
 }
 </script>
