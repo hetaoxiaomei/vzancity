@@ -274,15 +274,15 @@
             <el-table-column label="操作" width="110">
               <template slot-scope="scope">
                 <el-button
-                  v-if="scope.row.Status==1||scope.row.Status==0"
-                  @click="setIgnore()"
+                  v-if="scope.row.Status==0"
+                  @click="setIgnore(scope.row)"
                   type="primary"
                   plain
                   size="mini"
                   style="margin:0 0 5px;"
                 >设为忽略</el-button>
                 <el-button
-                  v-if="scope.row.Status==2||scope.row.Status==0"
+                  v-if="scope.row.Status==0"
                   type="primary"
                   plain
                   size="mini"
@@ -636,12 +636,13 @@ export default {
       }).then(() => {
         self.$axios({
           method: 'GET',
-          url: '/city/GetIntentionList',
+          url: '/city/UpdateIntentionStatus',
           params: { cityInfoId: self.queryPara.cityInfoId, id: row.Id, status: 2 }// 对象
         })
           .then(function (res) {
             if (res.data.code === 1) { // 获取数据成功
               self.$message(res.data.msg)
+              self.loadData03()
             } else { // 获取数据失败
               self.$message(res.data.msg) // 弹出删除失败提示
             }
