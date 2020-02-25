@@ -162,7 +162,7 @@ export default {
     return {
       activeName: 'second',
       activeIndex: '1',
-      dialogWithdrawSeen: true,
+      dialogWithdrawSeen: false,
       income: {
         total: '1200',
         settlement: '500',
